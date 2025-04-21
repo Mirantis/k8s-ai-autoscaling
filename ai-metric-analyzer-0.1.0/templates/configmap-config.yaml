@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+data:
+  time_config.yaml: |
+    training_hours: {{ .Values.config.time_config.training_hours }}
+    forecast_hours: {{ .Values.config.time_config.forecast_hours }}
+    step_size: {{ .Values.config.time_config.step_size }}
+    min_data_points: {{ .Values.config.time_config.min_data_points }}
+
+  prometheus_config.yaml: |
+    url: "http://{{ .Release.Name }}-prometheus-prometheus.{{ .Release.Namespace }}.svc.cluster.local:9090/api/v1/query_range" 
+
+  metrics_queries.yaml: |
+{{ toYaml .Values.config.metrics_queries | indent 4 }}
+

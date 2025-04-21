@@ -1,0 +1,18 @@
+apiVersion: v2
+name: ai-metrics-analyzer
+description: AI-based Prometheus metrics forecaster
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+dependencies:
+  - name: kube-prometheus-stack
+    version: 69.4.1
+    repository: https://prometheus-community.github.io/helm-charts
+    alias: prometheus
+
+  - name: keda
+    version: "2.13.0"
+    repository: "https://kedacore.github.io/charts"
+    alias: keda
+

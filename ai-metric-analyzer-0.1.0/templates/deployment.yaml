@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: prophet 
+  template:
+    metadata:
+      labels:
+        app: prophet 
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.service.port }}"
+    spec:
+      containers:
+        - name: analyzer
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              apt-get update && \
+              apt-get install -y --no-install-recommends \
+                build-essential \
+                python3-dev \
+                libgcc-12-dev \
+                libstdc++6 && \
+              pip install --no-cache-dir pyyaml pandas prophet requests flask && \
+              python3 /app/analyze.py
+          volumeMounts:
+            - name: script-volume
+              mountPath: /app
+            - name: config-volume
+              mountPath: /config
+      volumes:
+        - name: script-volume
+          configMap:
+            name: {{ .Release.Name }}-script
+        - name: config-volume
+          configMap:
+            name: {{ .Release.Name }}-config
+
